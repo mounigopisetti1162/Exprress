@@ -15,7 +15,7 @@ console.log("mongo is connectedd");
 
 app.use(express.json());
 app.get("/", function (request, response) {
-  response.send("hehkvvvi🙋‍♂️, 🌏 🎊✨🤩 😆");
+  response.send("welcome🙋‍♂️, 🌏 🎊✨🤩 😆");
 });
 const movies = [
   {
