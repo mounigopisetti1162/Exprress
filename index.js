@@ -1,8 +1,20 @@
 import express from 'express'//type:module
+import { MongoClient } from 'mongodb';
+import * as dotenv from 'dotenv'
 // const express=require("express") type:'common.js'
 const app = express();
-
+dotenv.config();
 const PORT = 4000;
+// const MONGO_URL='mongodb://127.0.0.1'
+
+const MONGO_URL=process.env.MONGO_URL
+const client=new MongoClient(MONGO_URL)//dial
+//top level await
+await client.connect()//call
+console.log("mongo is connectedd")
+
+
+app.use(express.json())
 app.get("/", function (request, response) {
   response.send("hehkvvvi🙋‍♂️, 🌏 🎊✨🤩 😆");
 });
@@ -96,21 +108,37 @@ const movies=[
     "id": "109"
     }
     ]
-app.get("/movies",function(request,response)
+app.get("/movies",async function(request,response)
 {
+  //find always gives cursorer =>pagination find({})||to array
+  const movies=await client.db('test').collection('movies').find({}).toArray();
+
+
     response.send(movies)// helps to conve4rt the js array to json data
 })
+
 // nodemon for auto refreshuing this package is not need to be deloped in production but is need to develop in the development
-app.get("/movies/:id",function(request,response)
+
+app.get("/movies/:id", async function(request,response)
 {
         const {id}=request.params
         console.log(id)
-        const movie=movies.find(mv=>mv.id===id)
+        // const movie=movies.find(mv=>mv.id===id)
+        const movie= await client.db("test").collection('movies').findOne({id:id})
         movie ? response.send(movie):response.status(404).send({message:"movie not found"})
         
        // helps to conve4rt the js array to json data
     
 }) 
+//middle ware-express.json()
+app.post("/movies", async function(request,response)
+{
+  const data=request.body;
+  console.log(data)
+  // db.movies.insertMany(data)
+  const newmovie=await client.db('test').collection('movies').insertMany(data)
+  response.send(newmovie)
+})
 
 
 app.listen(PORT, () => console.log(`The server started in: ${PORT} ✨✨`));
